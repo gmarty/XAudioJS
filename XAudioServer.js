@@ -209,15 +209,15 @@ XAudioServer.prototype.initializeAudio = function() {
     }
     this.initializeMozAudio();
   }
-  catch (error) {
+  catch (error1) {
     try {
       this.initializeWebAudio();
     }
-    catch (error) {
+    catch (error2) {
       try {
         this.initializeFlashAudio();
       }
-      catch (error) {
+      catch (error3) {
         throw (new Error('Browser does not support real time audio output.'));
       }
     }
@@ -539,13 +539,13 @@ function getBufferSamples() {
   try {
     return audioContextSampleBuffer.subarray(0, audioBufferSize);
   }
-  catch (error) {
+  catch (error1) {
     try {
       //Regular array pass:
       audioContextSampleBuffer.length = audioBufferSize;
       return audioContextSampleBuffer;
     }
-    catch (error) {
+    catch (error2) {
       //Nightly Firefox 4 used to have the subarray function named as slice:
       return audioContextSampleBuffer.slice(0, audioBufferSize);
     }
@@ -587,11 +587,11 @@ function resetCallbackAPIAudioBuffer(APISampleRate, bufferAlloc) {
     try {
       audioContextHandle = new webkitAudioContext();              //Create a system audio context.
     }
-    catch (error) {
+    catch (error1) {
       try {
         audioContextHandle = new AudioContext();                //Create a system audio context.
       }
-      catch (error) {
+      catch (error2) {
         return;
       }
     }

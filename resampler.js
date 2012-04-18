@@ -145,13 +145,13 @@ Resampler.prototype.bufferSlice = function(sliceAmount) {
     try {
       return this.outputBuffer.subarray(0, sliceAmount);
     }
-    catch (error) {
+    catch (error1) {
       try {
         //Regular array pass:
         this.outputBuffer.length = sliceAmount;
         return this.outputBuffer;
       }
-      catch (error) {
+      catch (error2) {
         //Nightly Firefox 4 used to have the subarray function named as slice:
         return this.outputBuffer.slice(0, sliceAmount);
       }
