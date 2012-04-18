@@ -229,7 +229,7 @@ XAudioServer.prototype.preInitializeMozAudio = function() {
   this.audioHandleMoz = new Audio();
   this.audioHandleMoz.mozSetup(this.audioChannels, XAudioJSSampleRate);
   this.samplesAlreadyWritten = 0;
-  var emptySampleFrame = (this.audioChannels == 2) ? [0, 0] : [0];
+  var emptySampleFrame = (this.audioChannels == 2) ? getFloat32(2) : getFloat32(1);
   var prebufferAmount = 0;
   if (navigator.platform != 'MacIntel' && navigator.platform != 'MacPPC') {  //Mac OS X doesn't experience this moz-bug!
     while (this.audioHandleMoz.mozCurrentSampleOffset() == 0) {
