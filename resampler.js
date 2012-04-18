@@ -1,4 +1,12 @@
 //JavaScript Audio Resampler (c) 2011 - Grant Galitz
+/**
+ * @param {number} fromSampleRate
+ * @param {number} toSampleRate
+ * @param {number} channels
+ * @param {number} outputBufferSize
+ * @param {boolean} noReturn ?
+ * @constructor
+ */
 function Resampler(fromSampleRate, toSampleRate, channels, outputBufferSize, noReturn) {
   this.fromSampleRate = fromSampleRate;
   this.toSampleRate = toSampleRate;

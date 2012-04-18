@@ -8,6 +8,15 @@
 
   The callback is passed the number of samples requested, while it can return any number of samples it wants back.
 */
+/**
+ * @param {number} channels
+ * @param {number} sampleRate
+ * @param {number} minBufferSize
+ * @param {number} maxBufferSize
+ * @param {Function} underRunCallback
+ * @param {number} volume
+ * @constructor
+ */
 function XAudioServer(channels, sampleRate, minBufferSize, maxBufferSize, underRunCallback, volume) {
   this.audioChannels = (channels == 2) ? 2 : 1;
   webAudioMono = (this.audioChannels == 1);
