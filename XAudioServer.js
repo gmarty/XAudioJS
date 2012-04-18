@@ -1,14 +1,13 @@
-/*Initialize here first:
-  Example:
-    Stereo audio with a sample rate of 70 khz, a minimum buffer of 15000 samples total, a maximum buffer of 25000 samples total and a neutral amplitude value of -1.
-      var parentObj = this;
-      this.audioHandle = new XAudioServer(2, 70000, 15000, 25000, function (sampleCount) {
-        return parentObj.audioUnderRun(sampleCount);
-      }, -1);
-
-  The callback is passed the number of samples requested, while it can return any number of samples it wants back.
-*/
 /**
+ * Initialize here first:
+ * Example:
+ * Stereo audio with a sample rate of 70 khz, a minimum buffer of 15000 samples total, a maximum buffer of 25000 samples total and a neutral amplitude value of -1.
+ * var parentObj = this;
+ * this.audioHandle = new XAudioServer(2, 70000, 15000, 25000, function (sampleCount) {
+ * return parentObj.audioUnderRun(sampleCount);
+ * }, -1);
+ * The callback is passed the number of samples requested, while it can return any number of samples it wants back.
+ *
  * @param {number} channels
  * @param {number} sampleRate
  * @param {number} minBufferSize
@@ -33,20 +32,40 @@ function XAudioServer(channels, sampleRate, minBufferSize, maxBufferSize, underR
   this.mozAudioFound = false;
   this.initializeAudio();
 }
+
+
+/**
+ * @param {(Float32Array|Array)} buffer
+ */
 XAudioServer.prototype.MOZWriteAudio = function(buffer) {
   //mozAudio:
   this.MOZWriteAudioNoCallback(buffer);
   this.MOZExecuteCallback();
 };
+
+
+/**
+ * @param {(Float32Array|Array)} buffer
+ */
 XAudioServer.prototype.MOZWriteAudioNoCallback = function(buffer) {
   //mozAudio:
   this.writeMozAudio(buffer);
 };
+
+
+/**
+ * @param {(Float32Array|Array)} buffer
+ */
 XAudioServer.prototype.callbackBasedWriteAudio = function(buffer) {
   //Callback-centered audio APIs:
   this.callbackBasedWriteAudioNoCallback(buffer);
   this.callbackBasedExecuteCallback();
 };
+
+
+/**
+ * @param {(Float32Array|Array)} buffer
+ */
 XAudioServer.prototype.callbackBasedWriteAudioNoCallback = function(buffer) {
   //Callback-centered audio APIs:
   var length = buffer.length;
@@ -54,13 +73,18 @@ XAudioServer.prototype.callbackBasedWriteAudioNoCallback = function(buffer) {
     audioContextSampleBuffer[audioBufferSize++] = buffer[bufferCounter++];
   }
 };
-/*Pass your samples into here!
-Pack your samples as a one-dimenional array
-With the channel samplea packed uniformly.
-examples:
-    mono - [left, left, left, left]
-    stereo - [left, right, left, right, left, right, left, right]
-*/
+
+
+/**
+ * Pass your samples into here!
+ * Pack your samples as a one-dimenional array
+ * With the channel samplea packed uniformly.
+ * examples:
+ *   mono - [left, left, left, left]
+ *   stereo - [left, right, left, right, left, right, left, right]
+ *
+ * @param {(Float32Array|Array)} buffer
+ */
 XAudioServer.prototype.writeAudio = function(buffer) {
   if (this.audioType == 0) {
     this.MOZWriteAudio(buffer);
@@ -77,14 +101,19 @@ XAudioServer.prototype.writeAudio = function(buffer) {
     }
   }
 };
-/*Pass your samples into here if you don't want automatic callback calling:
-Pack your samples as a one-dimenional array
-With the channel samplea packed uniformly.
-examples:
-    mono - [left, left, left, left]
-    stereo - [left, right, left, right, left, right, left, right]
-Useful in preventing infinite recursion issues with calling writeAudio inside your callback.
-*/
+
+
+/**
+ * Pass your samples into here if you don't want automatic callback calling:
+ * Pack your samples as a one-dimenional array
+ * With the channel samplea packed uniformly.
+ * examples:
+ *   mono - [left, left, left, left]
+ *   stereo - [left, right, left, right, left, right, left, right]
+ * Useful in preventing infinite recursion issues with calling writeAudio inside your callback.
+ *
+ * @param {(Float32Array|Array)} buffer
+ */
 XAudioServer.prototype.writeAudioNoCallback = function(buffer) {
   if (this.audioType == 0) {
     this.MOZWriteAudioNoCallback(buffer);
@@ -101,8 +130,14 @@ XAudioServer.prototype.writeAudioNoCallback = function(buffer) {
     }
   }
 };
-//Developer can use this to see how many samples to write (example: minimum buffer allotment minus remaining samples left returned from this function to make sure maximum buffering is done...)
-//If -1 is returned, then that means metric could not be done.
+
+
+/**
+ * Developer can use this to see how many samples to write (example: minimum buffer allotment minus remaining samples left returned from this function to make sure maximum buffering is done...)
+ * If -1 is returned, then that means metric could not be done.
+ *
+ * @return {number}
+ */
 XAudioServer.prototype.remainingBuffer = function() {
   if (this.audioType == 0) {
     //mozAudio:
@@ -125,6 +160,7 @@ XAudioServer.prototype.remainingBuffer = function() {
   //Default return:
   return 0;
 };
+
 XAudioServer.prototype.MOZExecuteCallback = function() {
   //mozAudio:
   var samplesRequested = webAudioMinBufferSize - this.remainingBuffer();
@@ -132,6 +168,7 @@ XAudioServer.prototype.MOZExecuteCallback = function() {
     this.writeMozAudio(this.underRunCallback(samplesRequested));
   }
 };
+
 XAudioServer.prototype.callbackBasedExecuteCallback = function() {
   //WebKit /Flash Audio:
   var samplesRequested = webAudioMinBufferSize - this.remainingBuffer();
@@ -139,6 +176,7 @@ XAudioServer.prototype.callbackBasedExecuteCallback = function() {
     this.callbackBasedWriteAudioNoCallback(this.underRunCallback(samplesRequested));
   }
 };
+
 //If you just want your callback called for any possible refill (Execution of callback is still conditional):
 XAudioServer.prototype.executeCallback = function() {
   if (this.audioType == 0) {
@@ -156,7 +194,12 @@ XAudioServer.prototype.executeCallback = function() {
     }
   }
 };
-//DO NOT CALL THIS, the lib calls this internally!
+
+
+/**
+ * DO NOT CALL THIS, the lib calls this internally!
+ * @private
+ */
 XAudioServer.prototype.initializeAudio = function() {
   try {
     this.preInitializeMozAudio();
@@ -180,6 +223,7 @@ XAudioServer.prototype.initializeAudio = function() {
     }
   }
 };
+
 XAudioServer.prototype.preInitializeMozAudio = function() {
   //mozAudio - Synchronous Audio API
   this.audioHandleMoz = new Audio();
@@ -202,11 +246,13 @@ XAudioServer.prototype.preInitializeMozAudio = function() {
   webAudioMinBufferSize += this.samplesAlreadyWritten;
   this.mozAudioFound = true;
 };
+
 XAudioServer.prototype.initializeMozAudio = function() {
   //Fill in our own buffering up to the minimum specified:
   this.writeMozAudio(getFloat32(webAudioMinBufferSize));
   this.audioType = 0;
 };
+
 XAudioServer.prototype.initializeWebAudio = function() {
   if (launchedContext) {
     resetCallbackAPIAudioBuffer(webAudioActualSampleRate, samplesPerCallback);
@@ -216,6 +262,7 @@ XAudioServer.prototype.initializeWebAudio = function() {
     throw (new Error(''));
   }
 };
+
 XAudioServer.prototype.initializeFlashAudio = function() {
   var existingFlashload = document.getElementById('XAudioJS');
   if (existingFlashload == null) {
@@ -228,23 +275,23 @@ XAudioServer.prototype.initializeFlashAudio = function() {
     mainContainerNode.appendChild(containerNode);
     document.getElementsByTagName('body')[0].appendChild(mainContainerNode);
     swfobject.embedSWF(
-      'XAudioJS.swf',
-      'XAudioJS',
-      '8',
-      '8',
-      '9.0.0',
-      '',
-      {},
-      {'allowscriptaccess': 'always'},
-      {'style': 'position: static; visibility: hidden; margin: 8px; padding: 0px; border: none'},
-      function(event) {
-        if (event.success) {
-          thisObj.audioHandleFlash = event.ref;
+        'XAudioJS.swf',
+        'XAudioJS',
+        '8',
+        '8',
+        '9.0.0',
+        '',
+        {},
+        {'allowscriptaccess': 'always'},
+        {'style': 'position: static; visibility: hidden; margin: 8px; padding: 0px; border: none'},
+        function(event) {
+          if (event.success) {
+            thisObj.audioHandleFlash = event.ref;
+          }
+          else {
+            thisObj.audioType = 1;
+          }
         }
-        else {
-          thisObj.audioType = 1;
-        }
-      }
     );
   }
   else {
@@ -252,6 +299,11 @@ XAudioServer.prototype.initializeFlashAudio = function() {
   }
   this.audioType = 2;
 };
+
+
+/**
+ * @param {number} newVolume
+ */
 XAudioServer.prototype.changeVolume = function(newVolume) {
   if (newVolume >= 0 && newVolume <= 1) {
     XAudioJSVolume = newVolume;
@@ -263,7 +315,13 @@ XAudioServer.prototype.changeVolume = function(newVolume) {
     }
   }
 };
-//Moz Audio Buffer Writing Handler:
+
+
+/**
+ * Moz Audio Buffer Writing Handler.
+ *
+ * @param {(Float32Array|Array)} buffer
+ */
 XAudioServer.prototype.writeMozAudio = function(buffer) {
   var length = this.mozAudioTail.length;
   if (length > 0) {
@@ -279,7 +337,13 @@ XAudioServer.prototype.writeMozAudio = function(buffer) {
     this.mozAudioTail.push(buffer[index++]);
   }
 };
-//Checks to see if the NPAPI Adobe Flash bridge is ready yet:
+
+
+/**
+ * Checks to see if the NPAPI Adobe Flash bridge is ready yet:
+ *
+ * @return {boolean}
+ */
 XAudioServer.prototype.checkFlashInit = function() {
   if (!this.flashInitialized && this.audioHandleFlash && this.audioHandleFlash.initialize) {
     this.flashInitialized = true;
@@ -289,6 +353,13 @@ XAudioServer.prototype.checkFlashInit = function() {
   return this.flashInitialized;
 };
 /////////END LIB
+
+
+/**
+ * @param {number} size
+ * @return {(Float32Array|Array)}
+ * @private
+ */
 function getFloat32(size) {
   try {
     return new Float32Array(size);
@@ -297,6 +368,13 @@ function getFloat32(size) {
     return new Array(size);
   }
 }
+
+
+/**
+ * @param {number} size
+ * @return {(Float32Array|Array)}
+ * @private
+ */
 function getFloat32Flat(size) {
   try {
     var newBuffer = new Float32Array(size);
@@ -310,14 +388,28 @@ function getFloat32Flat(size) {
   }
   return newBuffer;
 }
+
 //Flash NPAPI Event Handler:
 var samplesPerCallback = 2048;      //Has to be between 2048 and 4096 (If over, then samples are ignored, if under then silence is added).
 var outputConvert = null;
+
+
+/**
+ * @private
+ */
 function audioOutputFlashEvent() {    //The callback that flash calls...
   resampleRefill();
   return outputConvert();
 }
-function generateFlashStereoString() {  //Convert the arrays to one long string for speed.
+
+
+/**
+ * Convert the arrays to one long string for speed.
+ *
+ * @return {string}
+ * @private
+ */
+function generateFlashStereoString() {
   var copyBinaryStringLeft = '';
   var copyBinaryStringRight = '';
   for (var index = 0; index < samplesPerCallback && resampleBufferStart != resampleBufferEnd; ++index) {
@@ -330,7 +422,15 @@ function generateFlashStereoString() {  //Convert the arrays to one long string 
   }
   return copyBinaryStringLeft + copyBinaryStringRight;
 }
-function generateFlashMonoString() {  //Convert the array to one long string for speed.
+
+
+/**
+ * Convert the array to one long string for speed.
+ *
+ * @return {string}
+ * @private
+ */
+function generateFlashMonoString() {
   var copyBinaryString = '';
   for (var index = 0; index < samplesPerCallback && resampleBufferStart != resampleBufferEnd; ++index) {
     //Sanitize the buffer:
@@ -341,6 +441,7 @@ function generateFlashMonoString() {  //Convert the array to one long string for
   }
   return copyBinaryString;
 }
+
 //Audio API Event Handler:
 var audioContextHandle = null;
 var audioNode = null;
@@ -359,7 +460,15 @@ var audioBufferSize = 0;
 var resampleBufferStart = 0;
 var resampleBufferEnd = 0;
 var resampleBufferSize = 2;
-function audioOutputEvent(event) {    //Web Audio API callback...
+
+
+/**
+ * Web Audio API callback...
+ *
+ * @param {AudioProcessingEvent} event
+ * @private
+ */
+function audioOutputEvent(event) {
   var index = 0;
   var buffer1 = event.outputBuffer.getChannelData(0);
   var buffer2 = event.outputBuffer.getChannelData(1);
@@ -390,6 +499,11 @@ function audioOutputEvent(event) {    //Web Audio API callback...
     ++index;
   }
 }
+
+
+/**
+ * @private
+ */
 function resampleRefill() {
   if (audioBufferSize > 0) {
     //Resample a chunk of audio:
@@ -410,9 +524,16 @@ function resampleRefill() {
     audioBufferSize = 0;
   }
 }
+
 function resampledSamplesLeft() {
   return ((resampleBufferStart <= resampleBufferEnd) ? 0 : resampleBufferSize) + resampleBufferEnd - resampleBufferStart;
 }
+
+
+/**
+ * @return {(Float32Array|Array)}
+ * @private
+ */
 function getBufferSamples() {
   //Typed array and normal array buffer section referencing:
   try {
@@ -430,7 +551,15 @@ function getBufferSamples() {
     }
   }
 }
-//Initialize WebKit Audio /Flash Audio Buffer:
+
+
+/**
+ * Initialize WebKit Audio / Flash Audio Buffer.
+ *
+ * @param {number} APISampleRate
+ * @param {*} bufferAlloc (Not sure what type it is. (Float32Array|Array)?).
+ * @private
+ */
 function resetCallbackAPIAudioBuffer(APISampleRate, bufferAlloc) {
   audioContextSampleBuffer = getFloat32(webAudioMaxBufferSize);
   audioBufferSize = webAudioMaxBufferSize;
@@ -451,6 +580,7 @@ function resetCallbackAPIAudioBuffer(APISampleRate, bufferAlloc) {
     outputConvert = generateFlashStereoString;
   }
 }
+
 //Initialize WebKit Audio:
 (function() {
   if (!launchedContext) {

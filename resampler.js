@@ -4,7 +4,7 @@
  * @param {number} toSampleRate
  * @param {number} channels
  * @param {number} outputBufferSize
- * @param {boolean} noReturn ?
+ * @param {boolean} noReturn
  * @constructor
  */
 function Resampler(fromSampleRate, toSampleRate, channels, outputBufferSize, noReturn) {
@@ -15,6 +15,7 @@ function Resampler(fromSampleRate, toSampleRate, channels, outputBufferSize, noR
   this.noReturn = !!noReturn;
   this.initialize();
 }
+
 Resampler.prototype.initialize = function() {
   //Perform some checks:
   if (this.fromSampleRate > 0 && this.toSampleRate > 0 && this.channels > 0) {
@@ -37,6 +38,7 @@ Resampler.prototype.initialize = function() {
     throw (new Error('Invalid settings specified for the resampler.'));
   }
 };
+
 Resampler.prototype.compileInterpolationFunction = function() {
   var toCompile = "var bufferLength = Math.min(buffer.length, this.outputBufferSize);\
   if ((bufferLength % " + this.channels + ") == 0) {\
@@ -110,6 +112,12 @@ Resampler.prototype.compileInterpolationFunction = function() {
   }";
   this.interpolate = Function("buffer", toCompile);
 };
+
+
+/**
+ * @param {(Float32Array|Array)} buffer
+ * @return {(number|Float32Array|Array)}
+ */
 Resampler.prototype.bypassResampler = function(buffer) {
   if (this.noReturn) {
     //Set the buffer passed as our own, as we don't need to resample it:
@@ -121,6 +129,12 @@ Resampler.prototype.bypassResampler = function(buffer) {
     return buffer;
   }
 };
+
+
+/**
+ * @param {number} sliceAmount
+ * @return {(number|Float32Array|Array)}
+ */
 Resampler.prototype.bufferSlice = function(sliceAmount) {
   if (this.noReturn) {
     //If we're going to access the properties directly from this object:
@@ -144,6 +158,11 @@ Resampler.prototype.bufferSlice = function(sliceAmount) {
     }
   }
 };
+
+
+/**
+ * @param {*=} generateTailCache (Not sure what type it is. Boolean?).
+ */
 Resampler.prototype.initializeBuffers = function(generateTailCache) {
   //Initialize the internal buffer:
   try {
