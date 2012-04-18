@@ -536,9 +536,15 @@ var swfobject = function() {
     return (pv[0] > v[0] || (pv[0] == v[0] && pv[1] > v[1]) || (pv[0] == v[0] && pv[1] == v[1] && pv[2] >= v[2])) ? true : false;
   }
 
-  /* Cross-browser dynamic CSS creation
-    - Based on Bobby van der Sluis' solution: http://www.bobbyvandersluis.com/articles/dynamicCSS.php
-  */
+  /**
+   * Cross-browser dynamic CSS creation
+   * - Based on Bobby van der Sluis' solution: http://www.bobbyvandersluis.com/articles/dynamicCSS.php
+   *
+   * @param {string} sel
+   * @param {string} decl
+   * @param {string=} media
+   * @param {boolean=} newStyle
+   */
   function createCSS(sel, decl, media, newStyle) {
     if (ua.ie && ua.mac) { return; }
     var h = doc.getElementsByTagName('head')[0];
