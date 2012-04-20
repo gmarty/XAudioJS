@@ -601,7 +601,7 @@ function resetCallbackAPIAudioBuffer(APISampleRate, bufferAlloc) {
       XAudioJSSampleRate = webAudioActualSampleRate = audioContextHandle.sampleRate;
       audioSource.buffer = audioContextHandle.createBuffer(1, 1, webAudioActualSampleRate);  //Create a zero'd input buffer for the input to be valid.
       audioNode = audioContextHandle.createJavaScriptNode(samplesPerCallback, 1, 2);      //Create 2 outputs and ignore the input buffer (Just copy buffer 1 over if mono)
-      audioNode.onaudioprocess = audioOutputEvent;                //Connect the audio processing event to a handling function so we can manipulate output
+      audioNode.onaudioprocess = /** @type {EventListener} */ (audioOutputEvent);                //Connect the audio processing event to a handling function so we can manipulate output
       audioSource.connect(audioNode);                        //Send and chain the input to the audio manipulation.
       audioNode.connect(audioContextHandle.destination);              //Send and chain the output of the audio manipulation to the system audio output.
       audioSource.noteOn(0);                            //Start the loop!
