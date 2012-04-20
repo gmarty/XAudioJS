@@ -165,12 +165,6 @@ Resampler.prototype.bufferSlice = function(sliceAmount) {
  */
 Resampler.prototype.initializeBuffers = function(generateTailCache) {
   //Initialize the internal buffer:
-  try {
-    this.outputBuffer = new Float32Array(this.outputBufferSize);
-    this.lastOutput = new Float32Array(this.channels);
-  }
-  catch (error) {
-    this.outputBuffer = [];
-    this.lastOutput = [];
-  }
+  this.outputBuffer = getFloat32(this.outputBufferSize);
+  this.lastOutput = getFloat32(this.channels);
 };
